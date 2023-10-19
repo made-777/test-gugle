@@ -44,20 +44,28 @@ app.get('/addContact', async (req, res) => {
   try {
     const contacts = google.people({ version: 'v1', auth: auth.getOAuth2Client() });
 
-    const response = await contacts.people.connections.list({
-      resourceName: 'people/me',
-      personFields: 'phoneNumbers'
-    });
+    // Fetch all contacts with pagination
+    let allContacts = [];
+    let nextPageToken = null;
 
-    const connections = response.data.connections || [];
+    do {
+      const response = await contacts.people.connections.list({
+        resourceName: 'people/me',
+        personFields: 'phoneNumbers',
+        pageToken: nextPageToken,
+      });
 
-    const contactExists = connections.some((contact) => {
-    const phones = contact.phoneNumbers || [];
+      if (response.data.connections) {
+        allContacts = allContacts.concat(response.data.connections);
+      }
+
+      nextPageToken = response.data.nextPageToken;
+    } while (nextPageToken);
+
+    const contactExists = allContacts.some((contact) => {
+      const phones = contact.phoneNumbers || [];
       return phones.some((phone) => {
         const canonicalForm = phone.canonicalForm || '';
-        console.log(`originalPhoneNumber: ${phoneNumber}`);
-        console.log(`res canonicalForm: ${canonicalForm}`);
-        console.log(`formattedPhoneNumber: ${formattedPhoneNumber}`);
         return formattedPhoneNumber === canonicalForm;
       });
     });
@@ -91,9 +99,6 @@ app.get('/addContact', async (req, res) => {
     res.send('Error checking or adding contact');
   }
 });
-
-
-
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
