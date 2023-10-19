@@ -54,10 +54,10 @@ app.get('/addContact', async (req, res) => {
       const phoneNumbers = connection.phoneNumbers || [];
 
       return phoneNumbers.some((phoneNumberObj) => {
-        // Normalize and format the phone number for comparison
         const normalizedPhoneNumber = phoneNumberObj.value.replace(/\D/g, '');
+        console.log(`normalizedPhoneNumber ${normalizedPhoneNumber}`);
         const normalizedCanonicalPhoneNumber = canonicalPhoneNumber.replace(/\D/g, '');
-
+        console.log(`normalizedCanonicalPhoneNumber ${normalizedCanonicalPhoneNumber}`);
         return normalizedPhoneNumber === normalizedCanonicalPhoneNumber;
       });
     });
