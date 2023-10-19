@@ -1,0 +1,21 @@
+{
+  "name": "wa-contact2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.4",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "google-auth-library": "^9.1.0",
+    "googleapis": "^127.0.0",
+    "node-fetch": "^3.3.2",
+    "readline": "^1.3.0"
+  }
+}
