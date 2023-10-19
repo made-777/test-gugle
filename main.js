@@ -49,12 +49,19 @@ app.get('/addContact', async (req, res) => {
     });
 
     const connections = response.data.connections;
+
     const contactExists = connections.some((connection) => {
-      const phoneNumbers = connection.phoneNumbers;
-      console.log(phoneNumbers);
-      return phoneNumbers.some((phoneNumberObj) => phoneNumberObj.value === canonicalPhoneNumber);
+      const phoneNumbers = connection.phoneNumbers || [];
+
+      return phoneNumbers.some((phoneNumberObj) => {
+        // Normalize and format the phone number for comparison
+        const normalizedPhoneNumber = phoneNumberObj.value.replace(/\D/g, '');
+        const normalizedCanonicalPhoneNumber = canonicalPhoneNumber.replace(/\D/g, '');
+
+        return normalizedPhoneNumber === normalizedCanonicalPhoneNumber;
+      });
     });
-    
+
     if (contactExists) {
       res.send('Contact already exists');
     } else {
@@ -84,6 +91,7 @@ app.get('/addContact', async (req, res) => {
     res.send('Error checking or adding contact');
   }
 });
+
 
 
 
