@@ -55,7 +55,7 @@ app.get('/addContact', async (req, res) => {
     const phones = contact.phoneNumbers || [];
       return phones.some((phone) => {
         const canonicalForm = phone.canonicalForm || '';
-        console.log(`originalPhoneNumber: ${phoneNumbers}`);
+        console.log(`originalPhoneNumber: ${phoneNumber}`);
         console.log(`res canonicalForm: ${canonicalForm}`);
         console.log(`formattedPhoneNumber: ${formattedPhoneNumber}`);
         return formattedPhoneNumber === canonicalForm;
