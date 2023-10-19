@@ -25,7 +25,7 @@ app.get('/auth/google/callback', async (req, res) => {
     const { tokens } = await oAuth2Client.getToken(code);
     oAuth2Client.setCredentials(tokens);
 
-    res.send('Login Sukses');
+    res.send('Login Suksesx');
   } catch (error) {
     res.send('Error during authentication');
   }
