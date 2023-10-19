@@ -8,8 +8,9 @@ const port = 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-function formatPhoneNumberToE164(phoneNumber) {
-  return `+62${phoneNumber.replace(/\D/g, '')}`;
+function formatPhoneNumber(phoneNumber) {
+  const formattedNumber = phoneNumber.replace(/^0/, '+62');
+  return formattedNumber;
 }
 
 app.get('/auth', (req, res) => {
@@ -38,7 +39,7 @@ app.get('/addContact', async (req, res) => {
     return res.send('Phone number not provided');
   }
 
-  const canonicalPhoneNumber = formatPhoneNumberToE164(phoneNumber);
+  const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
 
   try {
     const contacts = google.people({ version: 'v1', auth: auth.getOAuth2Client() });
@@ -48,17 +49,13 @@ app.get('/addContact', async (req, res) => {
       personFields: 'phoneNumbers'
     });
 
-    const connections = response.data.connections;
+    const connections = response.data.connections || [];
 
-    const contactExists = connections.some((connection) => {
-      const phoneNumbers = connection.phoneNumbers || [];
-
-      return phoneNumbers.some((phoneNumberObj) => {
-        const normalizedPhoneNumber = phoneNumberObj.value.replace(/\D/g, '');
-        console.log(`normalizedPhoneNumber ${normalizedPhoneNumber}`);
-        const normalizedCanonicalPhoneNumber = canonicalPhoneNumber.replace(/\D/g, '');
-        console.log(`normalizedCanonicalPhoneNumber ${normalizedCanonicalPhoneNumber}`);
-        return normalizedPhoneNumber === normalizedCanonicalPhoneNumber;
+    const contactExists = connections.some((contact) => {
+    const phones = contact.phoneNumbers || [];
+      return phones.some((phone) => {
+        const canonicalForm = phone.canonicalForm || '';
+        return formattedPhoneNumber === canonicalForm;
       });
     });
 
