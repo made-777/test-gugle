@@ -53,7 +53,7 @@ app.get('/addContact', async (req, res) => {
       const phoneNumbers = connection.phoneNumbers;
       return phoneNumbers.some((phoneNumberObj) => phoneNumberObj.value === canonicalPhoneNumber);
     });
-
+    console.log(connections);
     if (contactExists) {
       res.send('Contact already exists');
     } else {
