@@ -71,7 +71,7 @@ app.get('/addContact', async (req, res) => {
     });
 
     if (contactExists) {
-      res.send('Contact already exists');
+      res.status(302).send('Contact already exists');
     } else {
       const phoneWithoutHyphens = phoneNumber.replace(/-/g, '');
       const newContact = {
@@ -92,11 +92,10 @@ app.get('/addContact', async (req, res) => {
         requestBody: newContact,
       });
 
-      res.send('Contact added successfully');
+      res.status(200).send('Contact added successfully');
     }
   } catch (error) {
-    console.log(error);
-    res.send('Error checking or adding contact');
+    res.status(404).send('Error checking or adding contact');
   }
 });
 

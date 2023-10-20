@@ -1,65 +1,73 @@
 const fs = require('fs');
 const axios = require('axios');
-const readline = require('readline');
 
-const API_BASE_URL = 'http://localhost:3000/addContact';
+const API_BASE_URL = 'https://test-gugle-mades-projects.vercel.app/addcontact';
 
-// Function to remove duplicate phone numbers and delete same lines from a text file
-function removeDuplicatesAndDeleteSameLines(filename) {
-  const uniquePhoneNumbers = new Set();
-  const updatedLines = [];
-  const fileStream = fs.createReadStream(filename);
-  const rl = readline.createInterface({
-    input: fileStream,
-    crlfDelay: Infinity,
-  });
+// Function to remove lines with the same phone number from a text file
+const removeLinesWithSamePhoneNumber = async (filename) => {
+  try {
+    const data = await fs.promises.readFile(filename, 'utf-8');
+    const lines = data.split('\n');
+    const uniqueLines = [];
+    const seenPhoneNumbers = new Set();
 
-  rl.on('line', (line) => {
-    const parts = line.split(':');
-    if (parts.length >= 1) {
-      const phoneNumber = parts[1];
-      if (phoneNumber && !uniquePhoneNumbers.has(phoneNumber)) {
-        uniquePhoneNumbers.add(phoneNumber);
-        updatedLines.push(line);
+    for (const line of lines) {
+      const parts = line.split(':');
+      if (parts.length > 1) {
+        const phoneNumber = parts[1].trim();
+        if (!seenPhoneNumbers.has(phoneNumber)) {
+          seenPhoneNumbers.add(phoneNumber);
+          uniqueLines.push(line);
+        }
       }
     }
-  });
 
-  rl.on('close', () => {
-    fs.writeFileSync(filename, updatedLines.join('\n'));
-  });
-
-  return Array.from(uniquePhoneNumbers);
-}
-
-// Function to add contacts for a list of phone numbers
-async function addContacts(phoneNumbers) {
-  console.log('sini a');
-  for (const phoneNumber of phoneNumbers) {
-    try {
-      const response = await axios.get(API_BASE_URL, {
-        params: {
-          phone: phoneNumber,
-        },
-      });
-      console.log(response);
-      if (response.status === 200) {
-        console.log(`Contact with phone number ${phoneNumber} added successfully.`);
-      } else {
-        console.error(`Failed to add contact with phone number ${phoneNumber}.`);
-      }
-    } catch (error) {
-      console.error(`Error adding contact with phone number ${phoneNumber}: ${error.message}`);
-    }
+    const cleanedData = uniqueLines.join('\n');
+    await fs.promises.writeFile(filename, cleanedData);
+  } catch (err) {
+    throw err;
   }
 }
 
-(async () => {
+// Function to add contacts from a text file
+async function addContacts(filename) {
   try {
-    const phoneNumbers = removeDuplicatesAndDeleteSameLines('numbers.txt');
-    console.log('sini b');
-    await addContacts(phoneNumbers);
+    const data = await fs.promises.readFile(filename, 'utf-8');
+    const lines = data.split('\n');
+    for (const line of lines) {
+      const parts = line.split(':');
+      if (parts.length > 1) {
+        const name = parts[0].trim();
+        const phoneNumber = parts[1].trim();
+        console.log(phoneNumber);
+        try {
+          const response = await axios.get(`https://test-gugle-mades-projects.vercel.app/addcontact?phone=${phoneNumber}`);
+          console.log(response);
+          if (response.status === 200) {
+            console.log(`Contact with name '${name}' and phone number ${phoneNumber} added successfully.`);
+          } else {
+            console.error(`Failed to add contact${phoneNumber}.`);
+          }
+        } catch (error) {
+          console.error(`Error adding contact with name '${name}' and phone number ${phoneNumber}: ${error}`);
+        }
+      }
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function main() {
+  const filename = 'numbers.txt';
+  try {
+    await removeLinesWithSamePhoneNumber(filename);
+    console.log('Lines with the same phone number removed from numbers.txt.');
+
+    await addContacts(filename);
   } catch (error) {
     console.error(`Error: ${error.message}`);
   }
-})();
+}
+
+main();
