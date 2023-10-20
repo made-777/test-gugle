@@ -39,17 +39,19 @@ async function addContacts(filename) {
       if (parts.length > 1) {
         const name = parts[0].trim();
         const phoneNumber = parts[1].trim();
-        console.log(phoneNumber);
         try {
           const response = await axios.get(`https://test-gugle-mades-projects.vercel.app/addcontact?phone=${phoneNumber}`);
-          console.log(response);
-          if (response.status === 200) {
-            console.log(`Contact with name '${name}' and phone number ${phoneNumber} added successfully.`);
+          const statusx  = error.response.data;
+          if (statusx === 'Contact added successfully') {
+            console.log(`${phoneNumber} added successfully.`);
           } else {
-            console.error(`Failed to add contact${phoneNumber}.`);
+            console.log(`Failed to add contact${phoneNumber} ${statusx} .`);
           }
+          console.log(statusx);
         } catch (error) {
-          console.error(`Error adding contact with name '${name}' and phone number ${phoneNumber}: ${error}`);
+          console.log(statusx);
+          //console.error(`Error adding contact with name '${name}' and phone number ${phoneNumber}: ${error.response}`);
+         // console.log(error.response.data);
         }
       }
     }

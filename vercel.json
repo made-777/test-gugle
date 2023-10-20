@@ -2,7 +2,7 @@
     "version": 2,
     "builds": [
       {
-        "src": "main.js",
+        "src": "index.js",
         "use": "@vercel/node"
       }
     ],
@@ -11,7 +11,7 @@
       { "src": "/auth/google/callback", "dest": "/auth/google/callback" },
       { "src": "/addContact", "dest": "/addContact" },
       { "handle": "filesystem" },
-      { "src": "/(.*)", "status": 404, "dest": "main.js" }
+      { "src": "/(.*)", "dest": "index.js" }
     ]
   }
   
